@@ -1,6 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\VehicleController;
+use App\Http\Controllers\MaintenanceController;
+use App\Http\Controllers\BookingController;
+use App\Http\Controllers\DriverController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -14,4 +18,14 @@ Route::middleware([
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
+
+     Route::get('/voiture', function () {
+        return view('voiture'); // Nom du fichier blade
+    })->name('voiture');
+
+    Route::resource('vehicles', VehicleController::class);
+    Route::resource('maintenances', MaintenanceController::class);
+    Route::resource('bookings', BookingController::class);
+    Route::resource('drivers', DriverController::class);
 });
+
