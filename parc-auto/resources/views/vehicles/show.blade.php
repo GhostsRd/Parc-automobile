@@ -32,67 +32,79 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
                 <div class="md:col-span-1 space-y-6">
-    <div class="bg-white overflow-hidden shadow-xl sm:rounded-xl p-6 border border-gray-100">
-        <div class="flex items-center justify-center h-32 w-full bg-gray-50 rounded-lg mb-4 border-2 border-dashed border-gray-200">
-            <svg class="h-16 w-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-            </svg>
-        </div>
+                    <div class="bg-white overflow-hidden shadow-xl sm:rounded-xl p-6 border border-gray-100">
+                        <div
+                            class="flex items-center justify-center h-32 w-full bg-gray-50 rounded-lg mb-4 border-2 border-dashed border-gray-200">
+                            <svg class="h-16 w-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                            </svg>
+                        </div>
 
-        <h3 class="text-lg font-bold text-gray-900 border-b pb-2 mb-4">Informations</h3>
+                        <h3 class="text-lg font-bold text-gray-900 border-b pb-2 mb-4">Informations</h3>
 
-        <div class="space-y-4 text-sm">
-            <div>
-                <p class="text-gray-500 uppercase text-xs font-bold tracking-wider">Marque & Modèle</p>
-                <p class="font-bold text-gray-800 text-base">{{ $vehicle->marque }} {{ $vehicle->modele }}</p>
-            </div>
+                        <div class="space-y-4 text-sm">
+                            <div>
+                                <p class="text-gray-500 uppercase text-xs font-bold tracking-wider">Marque & Modèle</p>
+                                <p class="font-bold text-gray-800 text-base">{{ $vehicle->marque }} {{ $vehicle->modele
+                                    }}</p>
+                            </div>
 
-            <div class="bg-indigo-50 p-3 rounded-lg border border-indigo-100">
-                <p class="text-indigo-600 uppercase text-[10px] font-black tracking-widest">Kilométrage au compteur</p>
-                <div class="flex items-baseline">
-                    <p class="text-xl font-black text-indigo-900 font-mono">{{ number_format($vehicle->kilometrage_actuel, 0, ',', ' ') }}</p>
-                    <span class="ml-1 text-xs font-bold text-indigo-400 uppercase">km</span>
-                </div>
-            </div>
+                            <div class="bg-indigo-50 p-3 rounded-lg border border-indigo-100">
+                                <p class="text-indigo-600 uppercase text-[10px] font-black tracking-widest">Kilométrage
+                                    au compteur</p>
+                                <div class="flex items-baseline">
+                                    <p class="text-xl font-black text-indigo-900 font-mono">{{
+                                        number_format($vehicle->kilometrage_actuel, 0, ',', ' ') }}</p>
+                                    <span class="ml-1 text-xs font-bold text-indigo-400 uppercase">km</span>
+                                </div>
+                            </div>
 
-            <div>
-                <p class="text-gray-500 uppercase text-xs font-bold tracking-wider">Statut Actuel</p>
-                @php
-                    $statusClasses = [
-                        'disponible' => 'bg-emerald-100 text-emerald-800',
-                        'en_mission' => 'bg-amber-100 text-amber-800',
-                        'en_reparation' => 'bg-red-100 text-red-800'
-                    ][$vehicle->statut] ?? 'bg-gray-100 text-gray-800';
-                @endphp
-                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-black uppercase tracking-tighter {{ $statusClasses }}">
-                    {{ ucfirst(str_replace('_', ' ', $vehicle->statut)) }}
-                </span>
-            </div>
+                            <div>
+                                <p class="text-gray-500 uppercase text-xs font-bold tracking-wider">Statut Actuel</p>
+                                @php
+                                $statusClasses = [
+                                'disponible' => 'bg-emerald-100 text-emerald-800',
+                                'en_mission' => 'bg-amber-100 text-amber-800',
+                                'en_reparation' => 'bg-red-100 text-red-800'
+                                ][$vehicle->statut] ?? 'bg-gray-100 text-gray-800';
+                                @endphp
+                                <span
+                                    class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-black uppercase tracking-tighter {{ $statusClasses }}">
+                                    {{ ucfirst(str_replace('_', ' ', $vehicle->statut)) }}
+                                </span>
+                            </div>
 
-            <div class="flex items-center p-4 bg-gray-50 rounded-xl border border-dashed border-gray-300">
-                <div class="flex-shrink-0">
-                    <div class="h-10 w-10 rounded-full bg-white flex items-center justify-center shadow-sm">
-                        <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-width="2" />
-                        </svg>
+                            <div
+                                class="flex items-center p-4 bg-gray-50 rounded-xl border border-dashed border-gray-300">
+                                <div class="flex-shrink-0">
+                                    <div
+                                        class="h-10 w-10 rounded-full bg-white flex items-center justify-center shadow-sm">
+                                        <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path
+                                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                                stroke-width="2" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="ml-4">
+                                    <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest">Chauffeur
+                                        assigné</h4>
+                                    <p
+                                        class="text-sm font-bold {{ $vehicle->driver ? 'text-indigo-600' : 'text-gray-500 italic' }}">
+                                        {{ $vehicle->driver->full_name ?? 'Aucun titulaire' }}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="pt-2">
+                                <p class="text-gray-400 uppercase text-[10px] font-bold">Date d'ajout au parc</p>
+                                <p class="text-gray-600 font-medium">{{ $vehicle->created_at->format('d/m/Y') }}</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="ml-4">
-                    <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest">Chauffeur assigné</h4>
-                    <p class="text-sm font-bold {{ $vehicle->driver ? 'text-indigo-600' : 'text-gray-500 italic' }}">
-                        {{ $vehicle->driver->full_name ?? 'Aucun titulaire' }}
-                    </p>
-                </div>
-            </div>
-
-            <div class="pt-2">
-                <p class="text-gray-400 uppercase text-[10px] font-bold">Date d'ajout au parc</p>
-                <p class="text-gray-600 font-medium">{{ $vehicle->created_at->format('d/m/Y') }}</p>
-            </div>
-        </div>
-    </div>
-</div>
 
                 <div class="md:col-span-2" x-data="{ showForm: false }">
                     <div class="bg-white overflow-hidden shadow-xl sm:rounded-xl border border-gray-100">

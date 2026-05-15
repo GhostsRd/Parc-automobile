@@ -1,63 +1,75 @@
-<div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-    <h3 class="text-lg font-bold text-gray-900 mb-4">Enregistrer une intervention</h3>
-    
-    <form action="{{ route('maintenances.store') }}" method="POST">
-        @csrf
-        <input type="hidden" name="vehicle_id" value="{{ $vehicle->id }}">
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-bold text-xl text-gray-800 leading-tight">
+            Enregistrer une <span class="text-indigo-600">Maintenance</span>
+        </h2>
+    </x-slot>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-                <label class="block text-xs font-bold text-gray-500 uppercase">Type d'acte</label>
-                <select name="type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-fuchsia-500 focus:border-fuchsia-500">
-                    <option value="vidange">Vidange</option>
-                    <option value="pneus">Pneumatiques</option>
-                    <option value="freins">Système de freinage</option>
-                    <option value="courroie">Courroie de distribution</option>
-                    <option value="autre">Autre intervention</option>
-                </select>
-            </div>
+    <div class="py-12">
+        <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white shadow-xl sm:rounded-xl p-8 border border-gray-100">
+                <form action="{{ route('maintenances.store') }}" method="POST" class="space-y-6">
+                    @csrf
 
-            <div>
-                <label class="block text-xs font-bold text-gray-500 uppercase">Date d'intervention</label>
-                <input type="date" name="date_intervention" value="{{ date('Y-m-d') }}" 
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-fuchsia-500 focus:border-fuchsia-500">
-            </div>
-
-            <div>
-                <label class="block text-xs font-bold text-gray-500 uppercase">KM au moment de l'acte</label>
-                <input type="number" name="kilometrage_au_moment_de_l_acte" placeholder="Ex: 125000"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-fuchsia-500 focus:border-fuchsia-500">
-            </div>
-
-            <div>
-                <label class="block text-xs font-bold text-gray-500 uppercase text-fuchsia-600">Prochain rappel (KM)</label>
-                <input type="number" name="prochain_kilometrage_rappel" placeholder="Ex: 140000"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm border-fuchsia-200 focus:ring-fuchsia-500 focus:border-fuchsia-500">
-            </div>
-
-            <div>
-                <label class="block text-xs font-bold text-gray-500 uppercase">Coût total (HT/TTC)</label>
-                <div class="mt-1 relative rounded-md shadow-sm">
-                    <input type="number" step="0.01" name="cout" 
-                        class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:ring-fuchsia-500 focus:border-fuchsia-500" placeholder="0.00">
-                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                        <span class="text-gray-500 sm:text-sm">€</span>
+                    <div>
+                        <label class="block text-xs font-black text-gray-500 uppercase tracking-widest">Véhicule concerné</label>
+                        <select name="vehicle_id" required 
+                            class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 font-bold text-gray-700">
+                            <option value="">-- Choisir le véhicule --</option>
+                            @foreach($vehicles as $vehicle)
+                                <option value="{{ $vehicle->id }}">{{ $vehicle->immatriculation }} - {{ $vehicle->marque }}</option>
+                            @endforeach
+                        </select>
                     </div>
-                </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-black text-gray-500 uppercase tracking-widest">Type d'acte</label>
+                             <select name="type_entretien"
+                                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-fuchsia-500 focus:border-fuchsia-500">
+                                                <option value="vidange">Vidange</option>
+                                                <option value="pneus">Pneumatiques</option>
+                                                <option value="freins">Système de freinage</option>
+                                                <option value="courroie">Courroie de distribution</option>
+                                                <option value="autre">Autre intervention</option>
+                                            </select>
+                        
+                            </div>
+                        <div>
+                            <label class="block text-xs font-black text-gray-500 uppercase tracking-widest">Date de l'acte</label>
+                            <input type="date" name="date_maintenance" value="{{ date('Y-m-d') }}" required
+                                class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-black text-gray-500 uppercase tracking-widest">Kilométrage (KM)</label>
+                            <input type="number" name="kilometrage" required
+                                class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-black text-gray-500 uppercase tracking-widest">Coût TTC (€)</label>
+                            <input type="number" step="0.01" name="cout" required
+                                class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-black text-gray-500 uppercase tracking-widest">Notes & Observations</label>
+                        <textarea name="description" rows="3" placeholder="Détails de l'intervention..."
+                            class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                    </div>
+
+                    <div class="pt-4 border-t border-gray-100 flex justify-end space-x-3">
+                        <a href="{{ route('maintenances.index') }}" class="px-4 py-2 text-sm font-bold text-gray-500 hover:text-gray-700 transition">Annuler</a>
+                        <button type="submit" 
+                            class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-bold text-sm shadow-lg shadow-indigo-200 transition">
+                            Enregistrer l'intervention
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
-
-        <div class="mt-6">
-            <label class="block text-xs font-bold text-gray-500 uppercase">Notes détaillées</label>
-            <textarea name="notes" rows="3" 
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-fuchsia-500 focus:border-fuchsia-500" 
-                placeholder="Détails des pièces changées..."></textarea>
-        </div>
-
-        <div class="mt-6">
-            <button type="submit" class="w-full inline-flex justify-center py-3 px-4 border border-transparent shadow-sm text-sm font-bold rounded-md text-white bg-fuchsia-600 hover:bg-fuchsia-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-fuchsia-500 transition">
-                Enregistrer l'intervention
-            </button>
-        </div>
-    </form>
-</div>
+    </div>
+</x-app-layout>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Maintenance;
+use App\Models\Vehicle;
 
 class MaintenanceController extends Controller
 {
@@ -21,48 +22,55 @@ class MaintenanceController extends Controller
      */
     public function create()
     {
-        $request->validate([
-            'vehicle_id' => 'required|exists:vehicles,id',
-            'type' => 'required|string',
-            'date_intervention' => 'required|date',
-            'kilometrage_au_moment_de_l_acte' => 'required|integer',
-            'prochain_kilometrage_rappel' => 'required|integer|gt:kilometrage_au_moment_de_l_acte',
-            'cout' => 'nullable|numeric',
-            'notes' => 'nullable|string',
-        ]);
-
-        Maintenance::create($request->all());
-
-        return back()->with('success', 'Maintenance enregistrée !');
+     $vehicles = Vehicle::orderBy('immatriculation')->get();
+    return view('maintenances.create', compact('vehicles'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
-      // 1. Validation stricte des données
-        $validated = $request->validate([
-            'vehicle_id' => 'required|exists:vehicles,id',
-            'type' => 'required|string',
-            'date_intervention' => 'required|date',
-            'kilometrage_au_moment_de_l_acte' => 'required|integer',
-            'prochain_kilometrage_rappel' => 'required|integer|gt:kilometrage_au_moment_de_l_acte',
-            'cout' => 'nullable|numeric',
-            'notes' => 'nullable|string',
-        ]);
+{
+    $validated = $request->validate([
+        'vehicle_id'                     => 'required|exists:vehicles,id',
+        'type_entretien'                 => 'required|string', // Vient du formulaire
+        'date_maintenance'               => 'required|date',   // Vient du formulaire
+        'kilometrage'                    => 'required|integer',// Vient du formulaire
+        'cout'                           => 'required|numeric',
+        'description'                    => 'nullable|string', // Vient du formulaire
+    ]);
 
-        // 2. Création de la maintenance
-        Maintenance::create($validated);
+    try {
+        \DB::transaction(function () use ($validated) {
+            
+            // On mappe les noms du formulaire vers les noms de la base de données
+            $maintenanceData = [
+                'vehicle_id'                      => $validated['vehicle_id'],
+                'type'                            => $validated['type_entretien'], // 'type_entretien' -> 'type'
+                'date_intervention'               => $validated['date_maintenance'], // 'date_maintenance' -> 'date_intervention'
+                'kilometrage_au_moment_de_l_acte' => $validated['kilometrage'],      // 'kilometrage' -> 'kilometrage_au_moment_de_l_acte'
+                'cout'                            => $validated['cout'],
+                'notes'                           => $validated['description'],     // 'description' -> 'notes'
+            ];
 
-        // 3. Logique métier : Si c'est une grosse réparation, on peut changer le statut
-        // Optionnel : $vehicle = Vehicle::find($request->vehicle_id);
-        // if($request->type == 'reparation') { $vehicle->update(['statut' => 'en_reparation']); }
+            // Création
+            \App\Models\Maintenance::create($maintenanceData);
 
-        // 4. Redirection avec un message flash de succès
-        return back()->with('success', 'L\'intervention a été enregistrée avec succès.');
-    
+            // Mise à jour du véhicule
+            $vehicle = \App\Models\Vehicle::findOrFail($validated['vehicle_id']);
+            
+            // Vérifie si ta colonne dans la table 'vehicles' est 'kilometrage' ou 'kilometrage_actuel'
+            if ($validated['kilometrage'] > $vehicle->kilometrage) {
+                $vehicle->update(['kilometrage' => $validated['kilometrage']]);
+            }
+        });
+
+        return redirect()->route('maintenances.index')->with('success', 'Maintenance enregistrée !');
+
+    } catch (\Exception $e) {
+        dd($e->getMessage()); // Pour voir s'il reste une autre erreur de nom de colonne
     }
+}
 
     /**
      * Display the specified resource.
