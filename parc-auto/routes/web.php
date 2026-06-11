@@ -26,5 +26,8 @@ Route::middleware([
     Route::resource('maintenances', MaintenanceController::class);
     Route::resource('bookings', BookingController::class);
     Route::resource('drivers', DriverController::class);
+    Route::get('/mission', function () {
+        return view('mission'); // Nom du fichier blade
+    })->name('mission');
 });
 

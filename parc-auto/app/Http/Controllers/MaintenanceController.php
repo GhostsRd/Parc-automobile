@@ -23,7 +23,7 @@ class MaintenanceController extends Controller
     public function create()
     {
      $vehicles = Vehicle::orderBy('immatriculation')->get();
-    return view('maintenances.create', compact('vehicles'));
+     return view('maintenances.create', compact('vehicles'));
     }
 
     /**

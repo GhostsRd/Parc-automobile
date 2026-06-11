@@ -19,18 +19,18 @@ class BookingController extends Controller
     }
     public function edit(Booking $booking)
     {
-       // On vérifie que la mission est bien "en cours" avant de permettre la clôture
-    if ($booking->statut !== 'en_cours') {
-        return redirect()->route('bookings.index')
-            ->with('error', 'Cette mission est déjà clôturée ou annulée.');
-    }
+        // On vérifie que la mission est bien "en cours" avant de permettre la clôture
+        if ($booking->statut !== 'en_cours') {
+            return redirect()->route('bookings.index')
+                ->with('error', 'Cette mission est déjà clôturée ou annulée.');
+        }
 
-    return view('bookings.edit', compact('booking'));
+        return view('bookings.edit', compact('booking'));
     }
 
     public function create()
     {
-        $vehicles = Vehicle::where('statut', 'disponible')->get();
+        $vehicles = Vehicle::where('statut', 'actif')->get();
         $drivers = Driver::where('is_active', true)->get();
         return view('bookings.create', compact('vehicles', 'drivers'));
     }
@@ -84,7 +84,7 @@ class BookingController extends Controller
     
     $vehicle->update([
         'kilometrage_actuel' => $validated['km_retour'],
-        'statut' => 'disponible' // Le véhicule redevient libre
+        'statut' => 'actif' // Le véhicule redevient libre
     ]);
 
     return redirect()->route('bookings.index')

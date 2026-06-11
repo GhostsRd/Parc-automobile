@@ -11,13 +11,20 @@ class Vehicle extends Model
     use HasFactory;
 
     protected $fillable = [
-        'immatriculation',
-        'driver_id', 
-        'marque',
-        'modele',
-        'statut',
-        'kilometrage_actuel', // Assurez-vous que ce nom correspond à votre migration
-    ];
+    'immatriculation',
+    'marque',
+    'modele',
+    'annee',
+    'numero_chassis',
+    'numero_moteur',
+    'type_carburant',
+    'capacite_reservoir',
+    'kilometrage_initial',
+    'kilometrage_actuel',
+    'zone_affectation',
+    'statut',
+    'driver_id'
+];
 
     /**
      * Optionnel : Définir les relations pour plus tard
