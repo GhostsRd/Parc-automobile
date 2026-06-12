@@ -1,4 +1,9 @@
 <x-app-layout>
+     <x-slot name="header">
+        <h2 class="font-extrabold text-2xl text-gray-800 leading-tight">
+            Creer <span class="text-indigo-600"> une mission</span>
+        </h2>
+    </x-slot>
     <div class="py-12">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white p-8 shadow-2xl sm:rounded-2xl border border-gray-100">
@@ -71,16 +76,31 @@
                             <div>
                                 <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider">Lieu
                                     de départ</label>
-                                <input type="text" id="routeDepart" placeholder="Ex: Manakara"
+                                <input type="text" id="routeDepart" list="villesSuggestions" placeholder="Ex: Manakara"
                                     class="mt-1 block w-full rounded-lg text-sm border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 bg-white shadow-sm">
                             </div>
+
                             <div>
                                 <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider">Lieu
                                     d'arrivée</label>
-                                <input type="text" id="routeArrivee" placeholder="Ex: Fianarantsoa"
+                                <input type="text" id="routeArrivee" list="villesSuggestions"
+                                    placeholder="Ex: Fianarantsoa"
                                     class="mt-1 block w-full rounded-lg text-sm border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 bg-white shadow-sm">
                             </div>
                         </div>
+
+                        <datalist id="villesSuggestions">
+                            <option value="Manakara">
+                            <option value="Fianarantsoa">
+                            <option value="Mananjary">
+                            <option value="Antananarivo">
+                            <option value="Antsirabe">
+                            <option value="Ambositra">
+                            <option value="Toliara">
+                            <option value="Toamasina">
+                            <option value="Mahajanga">
+                            <option value="Farafangana">
+                        </datalist>
 
                         <div id="wrapperSimple" class="hidden">
                             <label
@@ -166,8 +186,8 @@
     </script>
 
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
         const btnCircuit = document.getElementById('btnModeCircuit');
         const btnSimple = document.getElementById('btnModeSimple');
         
@@ -244,5 +264,5 @@
             }
         }
     });
-</script>
+    </script>
 </x-app-layout>
