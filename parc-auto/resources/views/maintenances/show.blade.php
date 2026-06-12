@@ -1,67 +1,130 @@
-<div class="bg-white overflow-hidden shadow-sm sm:rounded-xl border border-gray-200 mt-6">
-    <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
-        <h3 class="text-lg font-bold text-gray-800">Historique des interventions</h3>
-        <span class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-bold">
-            {{ $vehicle->maintenances->count() }} Acte(s)
-        </span>
-    </div>
+<x-app-layout>
+    <x-slot name="header">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+                <h2 class="font-extrabold text-2xl text-gray-900 tracking-tight leading-tight">
+                    Détails de la <span class="text-indigo-600">Maintenance</span>
+                </h2>
+                <p class="text-sm text-gray-500 mt-1 font-medium italic">Fiche d'intervention et suivi d'atelier</p>
+            </div>
 
-    <div class="p-6">
-        @if($vehicle->maintenances->count() > 0)
-            <div class="flow-root">
-                <ul role="list" class="-mb-8">
-                    @foreach($vehicle->maintenances->sortByDesc('date_intervention') as $maintenance)
-                    <li>
-                        <div class="relative pb-8">
-                            @if (!$loop->last)
-                                <span class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
-                            @endif
-                            
-                            <div class="relative flex space-x-3">
-                                <div>
-                                    <span class="h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white {{ $maintenance->type == 'reparation' ? 'bg-red-500' : 'bg-fuchsia-500' }} text-white">
-                                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                        </svg>
-                                    </span>
-                                </div>
+            <div class="flex items-center gap-2">
+                <a href="{{ route('maintenances.index') }}"
+                    class="inline-flex items-center px-4 py-2 bg-white border border-gray-200 rounded-lg font-bold text-xs text-gray-600 uppercase tracking-widest hover:bg-gray-50 shadow-sm transition">
+                    Retour
+                </a>
+                <a href="{{ route('maintenances.edit', $maintenance) }}"
+                    class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-lg font-bold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 shadow-md shadow-indigo-100 transition">
+                    Modifier l'acte
+                </a>
+            </div>
+        </div>
+    </x-slot>
+
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+
+            <div class="bg-white overflow-hidden shadow-xl sm:rounded-xl border border-gray-100">
+                <div class="grid grid-cols-1 md:grid-cols-3 border-b border-gray-100 bg-white">
+                    
+                    <div class="p-6 border-b md:border-b-0 md:border-r border-gray-100">
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Type d'entretien</p>
+                        <p class="text-2xl font-black text-indigo-600 mt-2 uppercase tracking-tight">
+                            {{ str_replace('_', ' ', $maintenance->type ?? $maintenance->type_acte ?? 'Non défini') }}
+                        </p>
+                    </div>
+
+                    <div class="p-6 border-b md:border-b-0 md:border-r border-gray-100">
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Kilométrage (Acte)</p>
+                        <p class="text-2xl font-black text-gray-900 mt-2 font-mono">
+                            {{ number_format($maintenance->kilometrage_au_moment_de_l_acte ?? 0, 0, ',', ' ') }} <span class="text-xs font-medium text-gray-400">km</span>
+                        </p>
+                    </div>
+
+                    <div class="p-6">
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Coût Facturé</p>
+                        <p class="text-2xl font-black text-emerald-600 mt-2 font-mono">
+                            {{ number_format($maintenance->cout ?? $maintenance->prix ?? 0, 2, ',', ' ') }} <span class="text-xs font-medium text-gray-400">€ TTC</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-50/50 border-b border-gray-100">
+                                <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest">Véhicule Assigné</th>
+                                <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest">Date de l'acte</th>
+                                <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest text-center">Compteur Actuel</th>
+                                <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest text-center">Statut Acte</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            <tr class="hover:bg-gray-50/50 transition duration-150">
                                 
-                                <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
-                                    <div>
-                                        <p class="text-sm font-bold text-gray-900">
-                                            {{ ucfirst($maintenance->type) }} 
-                                            <span class="font-normal text-gray-500">— {{ number_format($maintenance->cout, 2) }} €</span>
-                                        </p>
-                                        <p class="mt-1 text-sm text-gray-600">
-                                            {{ $maintenance->notes ?? 'Aucune note descriptive.' }}
-                                        </p>
-                                        <div class="mt-2 flex space-x-4 text-xs text-gray-400">
-                                            <span class="flex items-center">
-                                                <svg class="h-3 w-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
-                                                {{ $maintenance->kilometrage_au_moment_de_l_acte }} km
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    @if($maintenance->vehicle)
+                                        <div class="flex flex-col">
+                                            <span class="text-sm font-bold text-gray-900 uppercase tracking-tight">
+                                                {{ $maintenance->vehicle->marque }}
                                             </span>
-                                            <span class="flex items-center text-fuchsia-600 font-semibold">
-                                                <svg class="h-3 w-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8v4l3 3" /></svg>
-                                                Prochain : {{ $maintenance->prochain_kilometrage_rappel }} km
+                                            <span class="text-xs text-indigo-500 font-black">
+                                                {{ $maintenance->vehicle->immatriculation }}
                                             </span>
                                         </div>
+                                    @else
+                                        <span class="text-xs text-red-500 italic">Aucun véhicule lié</span>
+                                    @endif
+                                </td>
+
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm font-bold text-gray-700">
+                                        @php
+                                            $dateBrute = $maintenance->date_maintenance ?? $maintenance->date_entretien ?? null;
+                                        @endphp
+                                        {{ $dateBrute ? \Carbon\Carbon::parse($dateBrute)->format('d/m/Y') : 'Date inconnue' }}
                                     </div>
-                                    <div class="whitespace-nowrap text-right text-sm text-gray-500">
-                                        <time datetime="{{ $maintenance->date_intervention }}">
-                                            {{ \Carbon\Carbon::parse($maintenance->date_intervention)->format('d M Y') }}
-                                        </time>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </li>
-                    @endforeach
-                </ul>
+                                    <div class="text-[10px] text-gray-400 font-medium uppercase tracking-tighter">Enregistré</div>
+                                </td>
+
+                                <td class="px-6 py-4 text-center whitespace-nowrap">
+                                    <span class="px-2 py-1 bg-gray-100 rounded text-xs font-mono font-bold text-gray-600 border border-gray-200">
+                                        {{ $maintenance->vehicle ? number_format($maintenance->vehicle->kilometrage_actuel, 0, ',', ' ') . ' km' : 'N/A' }}
+                                    </span>
+                                </td>
+
+                                <td class="px-6 py-4 text-center whitespace-nowrap">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest border bg-emerald-100 text-emerald-700 border-emerald-200 shadow-sm shadow-emerald-50">
+                                        <span class="w-1.5 h-1.5 mr-1.5 bg-emerald-500 rounded-full"></span>
+                                        Effectué
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        @else
-            <div class="text-center py-8">
-                <p class="text-gray-400 italic text-sm">Aucun historique disponible pour le moment.</p>
+
+            <div class="bg-white shadow-xl sm:rounded-xl border border-gray-100 overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest">Notes & Rapport d'intervention</h3>
+                </div>
+                <div class="p-6">
+                    @php
+                        // On teste les 3 variantes de noms de colonnes les plus courantes pour le texte
+                        $rapportText = $maintenance->description ?? $maintenance->notes ?? $maintenance->rapport ?? null;
+                    @endphp
+
+                    @if($rapportText)
+                        <p class="text-sm font-bold text-gray-700 leading-relaxed bg-gray-50 p-4 rounded-lg border border-gray-200/60 font-medium">
+                            {{ $rapportText }}
+                        </p>
+                    @else
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest italic text-center py-4">Aucun détail consigné dans la base de données.</p>
+                    @endif
+                </div>
             </div>
-        @endif
+
+        </div>
     </div>
-</div>
+</x-app-layout>

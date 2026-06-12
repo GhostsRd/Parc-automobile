@@ -20,7 +20,7 @@
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-xl border border-gray-100">
                 
@@ -55,7 +55,7 @@
                             </svg>
                         </div>
                         <input type="text" id="missionSearch"
-                            placeholder="Filtrer par lieu, ville, zone, chauffeur..."
+                            placeholder="Ex: Tapez 'Manakara Fianarantsoa' pour optimiser un circuit de trajet..."
                             class="block w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl text-base bg-white placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-500 transition-all shadow-sm">
                     </div>
                 </div>
@@ -65,7 +65,7 @@
                         <thead>
                             <tr class="bg-gray-50/50 border-b border-gray-100">
                                 <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest">Chauffeur / Véhicule</th>
-                                <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest">Destination & Motif</th>
+                                <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest">Destination & Circuit</th>
                                 <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest text-center">Dates & Durée A/R</th>
                                 <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest text-center">KM Départ</th>
                                 <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest text-center">Statut</th>
@@ -75,11 +75,9 @@
                         <tbody class="divide-y divide-gray-100">
                             @forelse($bookings as $booking)
                             @php
-                                // Conversion sécurisée en instances Carbon pour le calcul de durée
                                 $dateStart = $booking->date_depart instanceof \Carbon\Carbon ? $booking->date_depart : \Carbon\Carbon::parse($booking->date_depart);
                                 $dateEnd = $booking->date_retour_prevue instanceof \Carbon\Carbon ? $booking->date_retour_prevue : \Carbon\Carbon::parse($booking->date_retour_prevue);
                                 
-                                // Calcul de la différence absolue lisible en français (ex: "2 jours", "3 heures")
                                 $dureeTotal = $dateStart->diffForHumans($dateEnd, [
                                     'parts' => 2, 
                                     'syntax' => \Carbon\CarbonInterface::DIFF_ABSOLUTE
@@ -87,7 +85,7 @@
                             @endphp
 
                             <tr class="mission-row hover:bg-gray-50/50 transition duration-150"
-                                data-search="{{ strtolower($booking->destination) }} {{ strtolower($booking->motif) }} {{ strtolower($booking->driver->full_name) }} {{ strtolower($booking->vehicle->immatriculation) }}">
+                                data-search="{{ strtolower($booking->destination) }} {{ strtolower($booking->motif) }} {{ strtolower($booking->driver->full_name) }} {{ strtolower($booking->vehicle->immatriculation) }} {{ strtolower($booking->vehicle->marque) }}">
                                 
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex flex-col">
@@ -99,7 +97,15 @@
                                 </td>
 
                                 <td class="px-6 py-4">
-                                    <div class="text-sm font-bold text-gray-700">{{ $booking->destination }}</div>
+                                    <div class="flex items-center gap-2">
+                                        <div class="text-sm font-bold text-gray-700">{{ $booking->destination }}</div>
+                                        
+                                        @if(in_array($booking->statut, ['en_cours', 'en_attente']))
+                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-600 border border-indigo-100 animate-pulse">
+                                                🔄 Circuit Optimisable
+                                            </span>
+                                        @endif
+                                    </div>
                                     <div class="text-xs text-gray-400 truncate w-48">{{ $booking->motif ?? 'Aucun motif précisé' }}</div>
                                 </td>
 
@@ -173,7 +179,7 @@
                             @endforelse
                             <tr id="noMissionsRow" class="hidden">
                                 <td colspan="6" class="px-6 py-10 text-center text-sm italic text-gray-400 font-medium">
-                                    📍 Aucune mission trouvée pour cette recherche.
+                                    📍 Aucune mission ou circuit correspondant trouvé.
                                 </td>
                             </tr>
                         </tbody>
@@ -197,12 +203,19 @@
             const paginationContainer = document.getElementById('paginationContainer');
 
             searchInput.addEventListener('input', function (e) {
-                const query = e.target.value.toLowerCase().trim();
+                // Nettoyer la chaîne de caractères saisie et la séparer par mots
+                const cleanQuery = e.target.value.toLowerCase().replace(/[-–—]/g, ' ').trim();
+                const keywords = cleanQuery.split(/\s+/).filter(word => word.length > 0);
+                
                 let foundMatch = false;
 
                 rows.forEach(row => {
-                    const searchData = row.getAttribute('data-search');
-                    if (searchData.includes(query)) {
+                    const searchData = row.getAttribute('data-search').replace(/[-–—]/g, ' ');
+                    
+                    // Une ligne correspond si TOUS les mots-clés recherchés sont présents dans son texte
+                    const matchesAllKeywords = keywords.every(keyword => searchData.includes(keyword));
+
+                    if (keywords.length === 0 || matchesAllKeywords) {
                         row.classList.remove('hidden');
                         foundMatch = true;
                     } else {
@@ -210,14 +223,16 @@
                     }
                 });
 
+                // Gérer l'affichage du message d'erreur vide
                 if (foundMatch) {
                     noResultsRow.classList.add('hidden');
                 } else {
                     noResultsRow.classList.remove('hidden');
                 }
 
+                // Masquer la pagination pendant le filtrage
                 if (paginationContainer) {
-                    if (query.length > 0) {
+                    if (keywords.length > 0) {
                         paginationContainer.classList.add('hidden');
                     } else {
                         paginationContainer.classList.remove('hidden');

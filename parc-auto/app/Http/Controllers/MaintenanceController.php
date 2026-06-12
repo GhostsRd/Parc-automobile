@@ -77,8 +77,10 @@ class MaintenanceController extends Controller
      */
     public function show(string $id)
     {
-       $vehicle->load('maintenances'); // Charge les maintenances liées
-        return view('vehicles.show', compact('vehicle'));
+        // On récupère la maintenance spécifique cliquée, avec son véhicule lié
+    $maintenance = Maintenance::with('vehicle')->findOrFail($id);
+    
+    return view('maintenances.show', compact('maintenance'));
     }
 
     /**
