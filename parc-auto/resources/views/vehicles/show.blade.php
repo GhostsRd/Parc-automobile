@@ -29,76 +29,173 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
                 {{-- COLONNE GAUCHE : INFOS VEHICULE --}}
-                <div class="md:col-span-1 space-y-6">
-                    <div class="bg-white overflow-hidden shadow-xl sm:rounded-xl p-6 border border-gray-100">
-                        <div class="flex items-center justify-center h-32 w-full bg-gray-50 rounded-lg mb-4 border-2 border-dashed border-gray-200">
-                            <svg class="h-16 w-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                            </svg>
-                        </div>
+               <div class="md:col-span-1 space-y-6">
+    <div class="bg-white overflow-hidden shadow-xl sm:rounded-xl border border-gray-100">
+        
+        <div class="p-6">
+            <div class="flex items-center justify-center h-32 w-full bg-gray-50 rounded-lg mb-4 border-2 border-dashed border-gray-200">
+                <svg class="h-16 w-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                </svg>
+            </div>
 
-                        <h3 class="text-lg font-bold text-gray-900 border-b pb-2 mb-4">Informations</h3>
+            <h3 class="text-lg font-bold text-gray-900 border-b pb-2 mb-4">Informations</h3>
 
-                        <div class="space-y-4 text-sm">
-                            <div>
-                                <p class="text-gray-500 uppercase text-xs font-bold tracking-wider">Marque & Modèle</p>
-                                <p class="font-bold text-gray-800 text-base">{{ $vehicle->marque }} {{ $vehicle->modele }}</p>
-                            </div>
+            <div class="space-y-4 text-sm">
+                <div>
+                    <p class="text-gray-500 uppercase text-xs font-bold tracking-wider">Marque & Modèle</p>
+                    <p class="font-bold text-gray-800 text-base">{{ $vehicle->marque }} {{ $vehicle->modele }}</p>
+                </div>
 
-                            <div class="bg-indigo-50 p-3 rounded-lg border border-indigo-100">
-                                <p class="text-indigo-600 uppercase text-[10px] font-black tracking-widest">Kilométrage actuel</p>
-                                <div class="flex items-baseline">
-                                    <p class="text-xl font-black text-indigo-900 font-mono">
-                                        {{ number_format($vehicle->kilometrage, 0, ',', ' ') }}
-                                    </p>
-                                    <span class="ml-1 text-xs font-bold text-indigo-400 uppercase">km</span>
-                                </div>
-                            </div>
-
-                            <div>
-                                <p class="text-gray-500 uppercase text-xs font-bold tracking-wider">Statut Actuel</p>
-                                @php
-                                    $statusClasses = [
-                                        'disponible' => 'bg-emerald-100 text-emerald-800',
-                                        'en_mission' => 'bg-amber-100 text-amber-800',
-                                        'en_reparation' => 'bg-red-100 text-red-800'
-                                    ][$vehicle->statut] ?? 'bg-gray-100 text-gray-800';
-                                @endphp
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-black uppercase tracking-tighter {{ $statusClasses }}">
-                                    {{ ucfirst(str_replace('_', ' ', $vehicle->statut)) }}
-                                </span>
-                            </div>
-
-                            <div class="flex items-center p-4 bg-gray-50 rounded-xl border border-dashed border-gray-300">
-                                <div class="flex-shrink-0">
-                                    <div class="h-10 w-10 rounded-full bg-white flex items-center justify-center shadow-sm">
-                                        <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-width="2" />
-                                        </svg>
-                                    </div>
-                                </div>
-                                <div class="ml-4">
-                                    <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest">Chauffeur assigné</h4>
-                                    <p class="text-sm font-bold {{ $vehicle->driver ? 'text-indigo-600' : 'text-gray-500 italic' }}">
-                                        {{ $vehicle->driver->full_name ?? 'Aucun titulaire' }}
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div class="pt-2">
-                                <p class="text-gray-400 uppercase text-[10px] font-bold">Date d'ajout au parc</p>
-                                <p class="text-gray-600 font-medium">{{ $vehicle->created_at->format('d/m/Y') }}</p>
-                            </div>
-                        </div>
+                <div class="bg-indigo-50 p-3 rounded-lg border border-indigo-100">
+                    <p class="text-indigo-600 uppercase text-[10px] font-black tracking-widest">Kilométrage actuel</p>
+                    <div class="flex items-baseline">
+                        <p class="text-xl font-black text-indigo-900 font-mono">
+                            {{ number_format($vehicle->kilometrage, 0, ',', ' ') }}
+                        </p>
+                        <span class="ml-1 text-xs font-bold text-indigo-400 uppercase">km</span>
                     </div>
                 </div>
+
+                <div>
+                    <p class="text-gray-500 uppercase text-xs font-bold tracking-wider">Statut Actuel</p>
+                    @php
+                        $statusClasses = [
+                            'disponible' => 'bg-emerald-100 text-emerald-800',
+                            'en_mission' => 'bg-amber-100 text-amber-800',
+                            'en_reparation' => 'bg-red-100 text-red-800'
+                        ][$vehicle->statut] ?? 'bg-gray-100 text-gray-800';
+                    @endphp
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-black uppercase tracking-tighter {{ $statusClasses }}">
+                        {{ ucfirst(str_replace('_', ' ', $vehicle->statut)) }}
+                    </span>
+                </div>
+
+                <div class="flex items-center p-4 bg-gray-50 rounded-xl border border-dashed border-gray-300">
+                    <div class="flex-shrink-0">
+                        <div class="h-10 w-10 rounded-full bg-white flex items-center justify-center shadow-sm">
+                            <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-width="2" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest">Chauffeur assigné</h4>
+                        <p class="text-sm font-bold {{ $vehicle->driver ? 'text-indigo-600' : 'text-gray-500 italic' }}">
+                            {{ $vehicle->driver->full_name ?? 'Aucun titulaire' }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="pt-2">
+                    <p class="text-gray-400 uppercase text-[10px] font-bold">Date d'ajout au parc</p>
+                    <p class="text-gray-600 font-medium">{{ $vehicle->created_at->format('d/m/Y') }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-6 border-t border-gray-100 bg-gray-50/30">
+            <h3 class="text-xs font-black text-gray-900 uppercase tracking-wider mb-3">Utilisation & Analyse</h3>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm text-center">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total Missions</p>
+                    <p class="text-2xl font-black text-gray-900 mt-1 font-mono">
+                        {{ $vehicle->bookings_count ?? $vehicle->bookings->count() }}
+                    </p>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm text-center">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Maintenances</p>
+                    <p class="text-2xl font-black text-indigo-600 mt-1 font-mono">
+                        {{ $vehicle->maintenances_count ?? $vehicle->maintenances->count() }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-6 border-t border-gray-100">
+            <h3 class="text-xs font-black text-gray-900 uppercase tracking-wider mb-4">Mouvements Récents</h3>
+            
+            <div class="flow-root">
+                <ul role="list" class="-mb-8">
+                    @php
+                        $mouvements = collect();
+                        
+                        foreach($vehicle->bookings->take(5) as $b) {
+                            $mouvements->push([
+                                'date' => \Carbon\Carbon::parse($b->date_depart),
+                                'type' => 'mission',
+                                'titre' => $b->destination,
+                                'desc' => $b->driver->full_name ?? 'Chauffeur inconnu',
+                                'color' => 'bg-amber-500'
+                            ]);
+                        }
+
+                        foreach($vehicle->maintenances->take(5) as $m) {
+                            $mouvements->push([
+                                'date' => \Carbon\Carbon::parse($m->date_maintenance ?? $m->created_at),
+                                'type' => 'maintenance',
+                                'titre' => $m->type ?? 'Acte technique',
+                                'desc' => number_format($m->cout, 0, ',', ' ') . ' €' . ($m->garage ? ' - ' . $m->garage : ''),
+                                'color' => 'bg-red-500'
+                            ]);
+                        }
+
+                        $mouvements = $mouvements->sortByDesc('date')->take(5);
+                    @endphp
+
+                    @forelse($mouvements as $mouv)
+                    <li>
+                        <div class="relative pb-8">
+                            @if(!$loop->last)
+                                <span class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-100" aria-hidden="true"></span>
+                            @endif
+                            <div class="relative flex space-x-3">
+                                <div>
+                                    <span class="h-8 w-8 rounded-full {{ $mouv['color'] }} flex items-center justify-center ring-8 ring-white text-white shadow-sm">
+                                        @if($mouv['type'] === 'mission')
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                            </svg>
+                                        @else
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                            </svg>
+                                        @endif
+                                    </span>
+                                </div>
+                                <div class="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
+                                    <div class="overflow-hidden">
+                                        <p class="text-xs font-bold text-gray-900 tracking-tight truncate">{{ $mouv['titre'] }}</p>
+                                        <p class="text-[11px] text-gray-400 font-medium truncate mt-0.5">{{ $mouv['desc'] }}</p>
+                                    </div>
+                                    <div class="text-right whitespace-nowrap text-[10px] font-mono font-bold text-gray-400">
+                                        <time datetime="{{ $mouv['date']->toIso8601String() }}">{{ $mouv['date']->format('d M') }}</time>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    @empty
+                    <li class="text-center py-6 text-xs text-gray-400 italic font-medium">
+                        Aucun événement répertorié.
+                    </li>
+                    @endforelse
+                </ul>
+            </div>
+        </div>
+
+    </div>
+</div>
 
                 {{-- COLONNE DROITE : BLOCS HISTORIQUES --}}
                 <div class="md:col-span-2 space-y-6">
                     
                     {{-- BLOC 1 : HISTORIQUE DES MAINTENANCES --}}
                     <div class="bg-white overflow-hidden shadow-xl sm:rounded-xl border border-gray-100" x-data="{ showForm: false }">
-    <div class="border-b border-gray-100 bg-gray-50/50 px-6 py-4 flex justify-between items-center">
+ 
+                        <div class="border-b border-gray-100 bg-gray-50/50 px-6 py-4 flex justify-between items-center">
         <h3 class="text-lg font-bold text-gray-800">Historique des Maintenances</h3>
         <div class="flex items-center space-x-2">
             <a href="{{ route('maintenances.index', ['vehicle_id' => $vehicle->id]) }}" 

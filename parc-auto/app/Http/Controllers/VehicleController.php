@@ -81,7 +81,13 @@ class VehicleController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $vehicle = Vehicle::findOrFail($id);
+
+        // 2. Récupérer les chauffeurs pour le menu déroulant
+        $drivers = Driver::orderBy('full_name')->get(); // Ajustez selon votre modèle Driver
+
+        // 3. CRITICAL : Ne pas oublier le "return" devant la vue
+        return view('vehicles.edit', compact('vehicle', 'drivers'));
     }
 
     /**
@@ -89,19 +95,33 @@ class VehicleController extends Controller
      */
     public function update(Request $request, string $id)
     {
-       $validated = $request->validate([
-        'immatriculation'    => 'required|string|max:20|unique:vehicles,immatriculation,' . $vehicle->id,
-        'marque'             => 'required|string|max:100',
-        'modele'             => 'required|string|max:100',
-        'kilometrage_actuel' => 'required|integer|min:0',
-        'statut'             => 'required|in:disponible,en_reparation,en_mission,immobilise',
-        'driver_id'          => 'nullable|exists:drivers,id',
-    ]);
+        // 1. Récupérer le véhicule ou renvoyer une erreur 404
+        $vehicle = Vehicle::findOrFail($id);
 
-    $vehicle->update($validated);
+        // 2. Valider TOUS les champs envoyés par le formulaire personnalisé
+        $validated = $request->validate([
+            // Le .$vehicle->id permet d'ignorer le véhicule actuel pour la règle unique
+            'immatriculation'    => 'required|string|max:20|unique:vehicles,immatriculation,' . $vehicle->id,
+            'marque'             => 'required|string|max:100',
+            'modele'             => 'required|string|max:100',
+            'annee'              => 'nullable|integer|min:1900|max:' . (date('Y') + 1),
+            'numero_chassis'     => 'nullable|string|max:50',
+            'numero_moteur'      => 'nullable|string|max:50',
+            'type_carburant'     => 'nullable|in:diesel,essence,electrique',
+            'capacite_reservoir' => 'nullable|numeric|min:0',
+            'kilometrage_initial'=> 'required|integer|min:0',
+            'kilometrage_actuel' => 'required|integer|min:0',
+            'zone_affectation'   => 'nullable|in:urbaine,regionale,nationale',
+            'driver_id'          => 'nullable|exists:drivers,id',
+            'statut'             => 'required|in:actif,en_maintenance,hors_service,en_mission,en_reservation,immobilise',
+        ]);
 
-    return redirect()->route('vehicles.show', $vehicle)
-        ->with('success', "Mise à jour effectuée.");
+        // 3. Mettre à jour la base de données
+        $vehicle->update($validated);
+
+        // 4. Rediriger avec un message flash de succès
+        return redirect()->route('vehicles.show', $vehicle)
+            ->with('success', "Le véhicule a été mis à jour avec succès.");
     }
 
     /**

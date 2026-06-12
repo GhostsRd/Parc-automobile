@@ -23,6 +23,30 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-xl border border-gray-100">
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 border-b border-gray-100 bg-white">
+                    <div class="p-6 border-b md:border-b-0 md:border-r border-gray-100">
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Volume Global</p>
+                        <p class="text-2xl font-black text-gray-900 mt-2">
+                            {{ $bookings->count() }} {{ $bookings->count() > 1 ? 'Missions' : 'Mission' }}
+                        </p>
+                    </div>
+
+                    <div class="p-6 border-b md:border-b-0 md:border-r border-gray-100">
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Trajets Actifs</p>
+                        <p class="text-2xl font-black text-emerald-600 mt-2">
+                            {{ $bookings->where('statut', 'en_cours')->count() }} <span class="text-xs font-medium text-gray-400">sur la route</span>
+                        </p>
+                    </div>
+
+                    <div class="p-6">
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Flotte Sollicitée</p>
+                        <p class="text-2xl font-black text-indigo-600 mt-2">
+                            {{ $bookings->unique('vehicle_id')->count() }} <span class="text-xs font-medium text-gray-400">{{ $bookings->unique('vehicle_id')->count() > 1 ? 'Véhicules actifs' : 'Véhicule actif' }}</span>
+                        </p>
+                    </div>
+                </div>
+
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>

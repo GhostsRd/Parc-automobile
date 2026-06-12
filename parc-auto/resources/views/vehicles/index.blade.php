@@ -1,58 +1,77 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-bold text-xl text-gray-800 leading-tight">
-            {{ __('Gestion du Parc Automobile') }}
-        </h2>
+        <div class="flex justify-between items-center">
+            <h2 class="font-extrabold text-2xl text-gray-900 tracking-tight">
+                Gestion du <span class="text-indigo-600">Parc Automobile</span>
+            </h2>
+            <a href="{{ route('vehicles.create') }}"
+                class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg font-bold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 transition">
+                Ajouter un véhicule
+            </a>
+        </div>
     </x-slot>
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-xl sm:rounded-xl p-6">
+            
+            <div class="bg-white overflow-hidden shadow-xl sm:rounded-xl border border-gray-100">
                 
-                <div class="mb-6 relative">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
+                <div class="grid grid-cols-1 md:grid-cols-3 border-b border-gray-100">
+                    <div class="p-6 border-b md:border-b-0 md:border-r border-gray-100">
+                        <p class="text-sm text-gray-500 font-medium uppercase tracking-wider">Flotte Totale</p>
+                        <p class="text-2xl font-black text-gray-900 mt-1">
+                            {{ $vehicles->count() }} {{ $vehicles->count() > 1 ? 'Véhicules' : 'Véhicule' }}
+                        </p>
                     </div>
-                    <input type="text" id="searchInput"
-                        placeholder="Rechercher une immatriculation, une marque ou un modèle..."
-                        class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition duration-150 ease-in-out">
+
+                    <div class="p-6 border-b md:border-b-0 md:border-r border-gray-100">
+                        <p class="text-sm text-gray-500 font-medium uppercase tracking-wider">Véhicules Actifs</p>
+                        <p class="text-2xl font-black text-green-600 mt-1">
+                            {{ $vehicles->where('statut', 'actif')->count() }}
+                        </p>
+                    </div>
+
+                    <div class="p-6">
+                        <p class="text-sm text-gray-500 font-medium uppercase tracking-wider">Distance Totale</p>
+                        <p class="text-2xl font-black text-indigo-600 mt-1">
+                            {{ number_format($vehicles->sum('kilometrage_actuel'), 0, ',', ' ') }} KM
+                        </p>
+                    </div>
                 </div>
 
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-lg font-bold text-gray-900">Liste des véhicules</h3>
-
-                    <a href="{{ route('vehicles.create') }}"
-                        class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-lg font-bold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 active:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150 shadow-md shadow-indigo-100">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                        </svg>
-                        {{ __('Ajouter un véhicule') }}
-                    </a>
+                <div class="p-6 border-b border-gray-100 bg-gray-50/20">
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                        <input type="text" id="searchInput"
+                            placeholder="Rechercher une immatriculation, une marque ou un modèle..."
+                            class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition duration-150 ease-in-out">
+                    </div>
                 </div>
 
-                <div class="overflow-hidden bg-white shadow-sm sm:rounded-xl border border-gray-200">
-                    <table class="min-w-full divide-y divide-gray-200">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
                         <thead class="bg-gray-50/50">
                             <tr>
-                                <th scope="col" class="px-6 py-4 text-left text-xs font-black text-gray-500 uppercase tracking-widest">
+                                <th scope="col" class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">
                                     Véhicule & Infos
                                 </th>
-                                <th scope="col" class="px-6 py-4 text-left text-xs font-black text-gray-500 uppercase tracking-widest">
+                                <th scope="col" class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">
                                     Kilométrage Actuel
                                 </th>
-                                <th scope="col" class="px-6 py-4 text-left text-xs font-black text-gray-500 uppercase tracking-widest">
+                                <th scope="col" class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">
                                     Statut
                                 </th>
-                                <th scope="col" class="px-6 py-4 text-right text-xs font-black text-gray-500 uppercase tracking-widest">
+                                <th scope="col" class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">
                                     Actions
                                 </th>
                             </tr>
                         </thead>
-                        <tbody id="vehicleTable" class="divide-y divide-gray-100 bg-white">
+                        <tbody id="vehicleTable" class="divide-y divide-gray-100">
                             @foreach($vehicles as $vehicle)
                             <tr class="hover:bg-gray-50/80 transition-all duration-200">
                                 <td class="px-6 py-4 whitespace-nowrap">
@@ -66,15 +85,15 @@
                                         <div class="ml-4">
                                             <div class="text-sm font-bold text-gray-900 uppercase">{{ $vehicle->immatriculation }}</div>
                                             <div class="text-sm text-gray-500">{{ $vehicle->marque }} {{ $vehicle->modele }}</div>
-                                            
+
                                             @if($vehicle->zone_affectation)
-                                                <div class="text-xs text-indigo-500 font-semibold mt-0.5 inline-flex items-center">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                    </svg>
-                                                    Secteur : {{ ucfirst($vehicle->zone_affectation) }}
-                                                </div>
+                                            <div class="text-xs text-indigo-500 font-semibold mt-0.5 inline-flex items-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                </svg>
+                                                Secteur : {{ ucfirst($vehicle->zone_affectation) }}
+                                            </div>
                                             @endif
                                         </div>
                                     </div>
@@ -128,7 +147,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <div class="flex justify-end gap-3">
                                         <a href="{{ route('vehicles.show', $vehicle) }}"
-                                            class="inline-flex items-center px-3 py-1 bg-white border border-gray-300 rounded-lg font-bold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 transition">
+                                            class="inline-flex items-center px-3 py-1 bg-gray-100 hover:bg-gray-200 text-indigo-700 rounded-lg font-bold transition">
                                             Détails
                                         </a>
                                         <a href="{{ route('vehicles.edit', $vehicle) }}"
@@ -178,8 +197,16 @@
 
 <style>
     @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
     }
-    .fadeIn { animation: fadeIn 0.3s; }
+
+    .fadeIn {
+        animation: fadeIn 0.3s;
+    }
 </style>

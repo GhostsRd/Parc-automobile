@@ -22,6 +22,43 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-xl border border-gray-100">
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 border-b border-gray-100 bg-white">
+                    <div class="p-6 border-b md:border-b-0 md:border-r border-gray-100">
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Effectif Global</p>
+                        <p class="text-2xl font-black text-gray-900 mt-2">
+                            {{ $drivers->count() }} {{ $drivers->count() > 1 ? 'Chauffeurs' : 'Chauffeur' }}
+                        </p>
+                    </div>
+
+                    <div class="p-6 border-b md:border-b-0 md:border-r border-gray-100">
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Actifs & Opérationnels</p>
+                        <p class="text-2xl font-black text-emerald-600 mt-2">
+                            {{ $drivers->where('is_active', true)->count() }} <span class="text-xs font-medium text-gray-400">en service</span>
+                        </p>
+                    </div>
+
+                    <div class="p-6">
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Volume d'Interventions</p>
+                        <p class="text-2xl font-black text-indigo-600 mt-2">
+                            {{ $drivers->sum('maintenances_count') }} <span class="text-xs font-medium text-gray-400">Actes suivis</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="p-6 border-b border-gray-100 bg-gray-50/30">
+    <div class="relative w-full"> <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+        </div>
+        <input type="text" 
+               id="driverSearch"
+               placeholder="Rechercher un chauffeur, matricule ou permis..." 
+               class="block w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl text-base bg-white placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-500 transition-all shadow-sm">
+               </div>
+</div>
+
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
