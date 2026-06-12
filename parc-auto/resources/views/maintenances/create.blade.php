@@ -13,11 +13,13 @@
 
                     <div>
                         <label class="block text-xs font-black text-gray-500 uppercase tracking-widest">Véhicule concerné</label>
-                        <select name="vehicle_id" required 
+                        <select name="vehicle_id" id="vehicleSelect" required 
                             class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 font-bold text-gray-700">
                             <option value="">-- Choisir le véhicule --</option>
                             @foreach($vehicles as $vehicle)
-                                <option value="{{ $vehicle->id }}">{{ $vehicle->immatriculation }} - {{ $vehicle->marque }}</option>
+                                <option value="{{ $vehicle->id }}" data-km="{{ $vehicle->kilometrage_actuel }}">
+                                    {{ $vehicle->immatriculation }} - {{ $vehicle->marque }} ({{ number_format($vehicle->kilometrage_actuel, 0, ',', ' ') }} km)
+                                </option>
                             @endforeach
                         </select>
                     </div>
@@ -25,16 +27,14 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-xs font-black text-gray-500 uppercase tracking-widest">Type d'acte</label>
-                             <select name="type_entretien"
-                                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-fuchsia-500 focus:border-fuchsia-500">
-                                                <option value="vidange">Vidange</option>
-                                                <option value="pneus">Pneumatiques</option>
-                                                <option value="freins">Système de freinage</option>
-                                                <option value="courroie">Courroie de distribution</option>
-                                                <option value="autre">Autre intervention</option>
-                                            </select>
-                        
-                            </div>
+                            <select name="type_entretien" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-fuchsia-500 focus:border-fuchsia-500">
+                                <option value="vidange">Vidange</option>
+                                <option value="pneus">Pneumatiques</option>
+                                <option value="freins">Système de freinage</option>
+                                <option value="courroie">Courroie de distribution</option>
+                                <option value="autre">Autre intervention</option>
+                            </select>
+                        </div>
                         <div>
                             <label class="block text-xs font-black text-gray-500 uppercase tracking-widest">Date de l'acte</label>
                             <input type="date" name="date_maintenance" value="{{ date('Y-m-d') }}" required
@@ -45,8 +45,9 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-xs font-black text-gray-500 uppercase tracking-widest">Kilométrage (KM)</label>
-                            <input type="number" name="kilometrage" required
-                                class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                            <input type="number" name="kilometrage" id="kmInput" required readonly
+                                placeholder="Sélectionnez un véhicule..."
+                                class="mt-1 block w-full rounded-lg border-gray-300 bg-gray-50 text-gray-500 cursor-not-allowed shadow-sm focus:ring-0 focus:border-gray-300 font-mono font-bold">
                         </div>
                         <div>
                             <label class="block text-xs font-black text-gray-500 uppercase tracking-widest">Coût TTC (€)</label>
@@ -72,4 +73,22 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const vehicleSelect = document.getElementById('vehicleSelect');
+            const kmInput = document.getElementById('kmInput');
+
+            vehicleSelect.addEventListener('change', function () {
+                const selectedOption = this.options[this.selectedIndex];
+                const currentKm = selectedOption.getAttribute('data-km');
+
+                if (currentKm) {
+                    kmInput.value = currentKm;
+                } else {
+                    kmInput.value = '';
+                }
+            });
+        });
+    </script>
 </x-app-layout>
