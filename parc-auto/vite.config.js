@@ -8,4 +8,8 @@ export default defineConfig({
             refresh: true,
         }),
     ],
+   // server: {
+        //host: '10.10.10.33', 
+        // Ou mets '0.0.0.0' pour écouter toutes les interfaces réseau
+    //},
 });
