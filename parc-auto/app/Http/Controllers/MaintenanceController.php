@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Maintenance;
+use Illuminate\Support\Facades\DB;
+use App\Models\Booking;
 use App\Models\Vehicle;
 
 class MaintenanceController extends Controller
@@ -32,43 +34,81 @@ class MaintenanceController extends Controller
     public function store(Request $request)
 {
     $validated = $request->validate([
-        'vehicle_id'                     => 'required|exists:vehicles,id',
-        'type_entretien'                 => 'required|string', // Vient du formulaire
-        'date_maintenance'               => 'required|date',   // Vient du formulaire
-        'kilometrage'                    => 'required|integer',// Vient du formulaire
-        'cout'                           => 'required|numeric',
-        'description'                    => 'nullable|string', // Vient du formulaire
+        'vehicle_id'       => 'required|exists:vehicles,id',
+        'type_entretien'   => 'required|string', 
+        'date_maintenance' => 'required|date',   
+        'kilometrage'      => 'required|integer',
+        'cout'             => 'required|numeric',
+        'description'      => 'nullable|string', 
     ]);
 
     try {
         \DB::transaction(function () use ($validated) {
             
-            // On mappe les noms du formulaire vers les noms de la base de données
+            // Création de l'entretien
             $maintenanceData = [
                 'vehicle_id'                      => $validated['vehicle_id'],
-                'type'                            => $validated['type_entretien'], // 'type_entretien' -> 'type'
-                'date_intervention'               => $validated['date_maintenance'], // 'date_maintenance' -> 'date_intervention'
-                'kilometrage_au_moment_de_l_acte' => $validated['kilometrage'],      // 'kilometrage' -> 'kilometrage_au_moment_de_l_acte'
+                'type'                            => $validated['type_entretien'], 
+                'date_intervention'               => $validated['date_maintenance'], 
+                'kilometrage_au_moment_de_l_acte' => $validated['kilometrage'],      
                 'cout'                            => $validated['cout'],
-                'notes'                           => $validated['description'],     // 'description' -> 'notes'
+                'notes'                           => $validated['description'],     
             ];
 
-            // Création
             \App\Models\Maintenance::create($maintenanceData);
 
-            // Mise à jour du véhicule
+            // Récupération du véhicule
             $vehicle = \App\Models\Vehicle::findOrFail($validated['vehicle_id']);
-            
-            // Vérifie si ta colonne dans la table 'vehicles' est 'kilometrage' ou 'kilometrage_actuel'
-            if ($validated['kilometrage'] > $vehicle->kilometrage) {
-                $vehicle->update(['kilometrage' => $validated['kilometrage']]);
+            $ancienKilometrage = $vehicle->kilometrage_actuel ?? $vehicle->kilometrage_initial ?? 0;
+
+            $updateData = [];
+
+            if ($validated['kilometrage'] >= $ancienKilometrage) {
+                $updateData['kilometrage_actuel'] = $validated['kilometrage'];
             }
+
+            // Nettoyage de la chaîne pour la détection
+            $typeClean = mb_strtolower($validated['type_entretien'], 'UTF-8');
+            
+            // Vérification stricte de la syntaxe ici
+            if (str_contains($typeClean, 'vidange')) {
+                $updateData['kilometrage_initial'] = $validated['kilometrage'];
+            }
+
+            if (!empty($updateData)) {
+                $vehicle->update($updateData);
+            }
+
+            // Gestion du chauffeur de secours
+            $driverId = $vehicle->driver_id;
+            if (!$driverId) {
+                $premierDriver = \App\Models\Driver::first();
+                $driverId = $premierDriver ? $premierDriver->id : null;
+            }
+
+            if (!$driverId) {
+                throw new \Exception("Aucun conducteur en base de données.");
+            }
+
+            // Création du trajet d'historique
+            \App\Models\Booking::create([
+                'vehicle_id'          => $vehicle->id,
+                'driver_id'           => $driverId, 
+                'destination'         => '🔧 Entretien (' . $validated['type_entretien'] . ')',
+                'motif'               => $validated['description'] ?? 'Passage à l\'atelier pour maintenance',
+                'km_depart'           => $ancienKilometrage,
+                'km_retour'           => $validated['kilometrage'],
+                'date_depart'         => $validated['date_maintenance'],
+                'date_retour_prevue'  => $validated['date_maintenance'],
+                'date_retour_reelle'  => $validated['date_maintenance'],
+                'statut'              => 'termine',
+            ]);
         });
 
-        return redirect()->route('maintenances.index')->with('success', 'Maintenance enregistrée !');
+        return redirect()->route('maintenances.index')->with('success', 'Maintenance enregistrée avec succès !');
 
     } catch (\Exception $e) {
-        dd($e->getMessage()); // Pour voir s'il reste une autre erreur de nom de colonne
+        dd("Erreur lors de l'enregistrement : " . $e->getMessage()); 
     }
 }
 
