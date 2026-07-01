@@ -29,5 +29,5 @@ jobs:
           push: true
           # Remplacez "facturation" par le nom du dépôt Docker Hub souhaité pour cette autre app
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/mon-autre-app:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/mon-autre-app:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/parc-auto:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/parc-auto:${{ github.sha }}
