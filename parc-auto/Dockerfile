@@ -1,7 +1,19 @@
-# Étape 1 : On utilise une image PHP officielle avec FPM
+# ==========================================
+# ÉTAPE 1 : Compilation des assets (CSS/JS) avec Node
+# ==========================================
+FROM node:20-alpine AS assets-builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build # Génère les fichiers dans public/build/
+
+# ==========================================
+# ÉTAPE 2 : Image finale de production (PHP)
+# ==========================================
 FROM php:8.2-fpm-alpine
 
-# Installer les dépendances système requises pour Laravel et MySQL
+# Installer les dépendances système requises
 RUN apk add --no-cache \
     bash \
     curl \
@@ -12,25 +24,23 @@ RUN apk add --no-cache \
     git \
     oniguruma-dev
 
-# Installer les extensions PHP nécessaires (notamment pdo_mysql pour la base de données)
+# Installer les extensions PHP
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
-# Installer Composer globalement
+# Récupérer Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Définir le dossier de travail dans le conteneur
 WORKDIR /var/www
-
-# Copier les fichiers du projet dans le conteneur
 COPY . .
 
-# Installer les dépendances de production de Laravel
+# 📁 C'EST ICI LA MAGIE : On récupère les assets compilés à l'étape 1
+COPY --from=assets-builder /app/public/build ./public/build
+
+# Installer les dépendances PHP de production
 RUN composer install --no-interaction --optimize-autoloader --no-dev
 
-# Donner les bons droits aux dossiers de stockage et de cache de Laravel
+# Droits d'accès pour Laravel
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
-# Exposer le port 9000 pour que PHP-FPM puisse recevoir les requêtes
 EXPOSE 9000
-
 CMD ["php-fpm"]
