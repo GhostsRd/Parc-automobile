@@ -13,7 +13,7 @@ RUN npm run build
 # ==========================================
 FROM php:8.2-fpm-alpine
 
-# Installer les dépendances système requises (Ajout de libzip-dev)
+# Installer les dépendances système (Ajout de gettext-dev et icu-dev)
 RUN apk add --no-cache \
     bash \
     curl \
@@ -23,25 +23,39 @@ RUN apk add --no-cache \
     zip \
     unzip \
     git \
-    oniguruma-dev
+    oniguruma-dev \
+    gettext-dev \
+    icu-dev
 
-# Installer les extensions PHP (Ajout de zip)
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
+# Installer les extensions PHP indispensables (Ajout de gettext, intl, opcache)
+# gettext : Résout l'erreur "Call to undefined function _()"
+# intl : Évite les crashs sur la gestion des devises/dates locales
+# opcache : Boost crucial pour la production
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip gettext intl opcache
 
 # Récupérer Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www
+
+# Copier d'abord uniquement composer pour optimiser le cache Docker
+COPY composer.json composer.lock ./
+RUN composer install --no-interaction --no-plugins --no-scripts --no-dev --prefer-dist
+
+# Copier le reste de l'application
 COPY . .
 
 # Récupérer les assets compilés à l'étape 1
 COPY --from=assets-builder /app/public/build ./public/build
 
-# Installer les dépendances PHP de production
-RUN composer install --no-interaction --optimize-autoloader --no-dev
+# Finaliser l'installation (génération de l'autoloader optimisé)
+RUN composer dump-autoload --no-dev --optimize
 
-# Droits d'accès pour Laravel
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+# Sécuriser les permissions (Pour éviter l'erreur 419 en mode "file")
+# On s'assure que TOUT le dossier de stockage appartient à l'utilisateur PHP-FPM
+RUN mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache storage/logs bootstrap/cache && \
+    chown -R www-data:www-data /var/www && \
+    chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
 EXPOSE 9000
 CMD ["php-fpm"]
