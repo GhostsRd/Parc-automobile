@@ -24,8 +24,8 @@ jobs:
       - name: 🚀 Construire et pousser l'image
         uses: docker/build-push-action@v5
         with:
-          context: .
-          file: ./Dockerfile
+          context: ./parc-auto # <-- TRÈS IMPORTANT : Dit à Docker que le code est dans ce dossier
+          file: ./parc-auto/Dockerfile
           push: true
           # Remplacez "facturation" par le nom du dépôt Docker Hub souhaité pour cette autre app
           tags: |
