@@ -6,26 +6,27 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 COPY . .
-RUN npm run build # Génère les fichiers dans public/build/
+RUN npm run build
 
 # ==========================================
 # ÉTAPE 2 : Image finale de production (PHP)
 # ==========================================
 FROM php:8.2-fpm-alpine
 
-# Installer les dépendances système requises
+# Installer les dépendances système requises (Ajout de libzip-dev)
 RUN apk add --no-cache \
     bash \
     curl \
     libpng-dev \
     libxml2-dev \
+    libzip-dev \
     zip \
     unzip \
     git \
     oniguruma-dev
 
-# Installer les extensions PHP
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+# Installer les extensions PHP (Ajout de zip)
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
 
 # Récupérer Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -33,7 +34,7 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www
 COPY . .
 
-# 📁 C'EST ICI LA MAGIE : On récupère les assets compilés à l'étape 1
+# Récupérer les assets compilés à l'étape 1
 COPY --from=assets-builder /app/public/build ./public/build
 
 # Installer les dépendances PHP de production
